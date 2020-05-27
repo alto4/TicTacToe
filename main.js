@@ -1,3 +1,5 @@
+let movesMade = 0;
+
 // Game Board as an array - module
 const Gameboard = (() => {
   let squares = ["", "", "", "", "", "", "", "", ""];
@@ -56,37 +58,68 @@ const RenderGame = (() => {
 
 // Game Object - module
 const PlayGame = (() => {
-  let movesMade = 0;
   let winnerDeclared = false;
+  const winningCombos = [
+    [0, 1, 2],
+    [3, 4, 5],
+    [6, 7, 8],
+    [0, 3, 6],
+    [1, 4, 7],
+    [2, 5, 8],
+    [0, 4, 8],
+    [2, 4, 6],
+  ];
   let mark = player1.mark;
-  for (movesMade = 0; movesMade < Gameboard.squares.length; movesMade++) {
-    const turnPrompt = document.querySelector(".turn");
 
-    let positionSelected;
-
-    //let position = prompt(`Player ${(movesMade % 2) + 1}, make a move`);
-    if ((movesMade % 2) + 1 === 1) {
-      mark = player1.mark;
-      turnPrompt.textContent = "Player 1's turn";
-    } else {
-      mark = player2.mark;
-      turnPrompt.textContent = "Player 2's turn";
-    }
-    Gameboard.squares.splice(positionSelected, 1, mark);
-  }
   let squares = Array.from(RenderGame.board.children);
   console.log(squares[0].getAttribute("data-index"));
   squares.forEach((square) => {
-    square.addEventListener("click", changeStatus);
+    square.addEventListener("mouseup", changeStatus);
 
     function changeStatus(e) {
+      const turnPrompt = document.querySelector(".turn");
       let index = e.target.getAttribute("data-index");
+      if (movesMade % 2 === 0) {
+        mark = player1.mark;
+        turnPrompt.textContent = "Player 1's turn";
+        movesMade++;
+      } else {
+        mark = player2.mark;
+        turnPrompt.textContent = "Player 2's turn";
+        movesMade++;
+      }
       e.target.textContent = mark;
       Gameboard.squares[index] = mark;
-      movesMade++;
       console.log(movesMade);
+      // Check here for a win or a draw
+      if (movesMade === 9) {
+        alert("It's a draw");
+      }
     }
   });
+
+  return {
+    winningCombos,
+  };
 })();
 
 // Logic to Check if a winner pattern has been created with matching marks, or if the game is a tie/stale-mate
+function checkForWinningCombo(squares) {
+  console.log(Gameboard.squares);
+  console.log(PlayGame.winningCombos);
+
+  const winningArray = [];
+  PlayGame.winningCombos.forEach((combo) => {
+    if (Gameboard.squares[combo]) {
+      winningArray.push(Gameboard.squares[combo]);
+    }
+  });
+
+  PlayGame.winningCombos.forEach((combo) => {
+    if (winningArray === PlayGame.winningCombos) {
+      return "we have a winner";
+    }
+    return "Loser!";
+  });
+  console.log(winningArray);
+}
