@@ -1,17 +1,37 @@
+body {
+    background: #d2d7e7;
+    margin: auto;
+    text-align: center;
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+h1 {
+    text-transform: uppercase;
+    margin: 5rem auto 2rem;
+    color: #333;
+    font-size: 3rem;
+}
+
+.turn {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #555;
+    text-transform: uppercase;
+}
+
 header,
 .container {
     display: flex;
     justify-content: center;
-    width: 80%;
+    width: 100%;
     margin: 2rem auto;
-    font-family: Arial, Helvetica, sans-serif;
+    background: #d2d7e7;
 }
 
 .board {
     border: 5px solid #333;
+    border-radius: .5em;
 }
-
-
 
 .square {
     width: 100px;
@@ -24,4 +44,50 @@ header,
     color: #333;
     background: #ccc;
     cursor: pointer;
+}
+
+.scoreboard {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 45%;
+    margin: auto;
+}
+
+.scoreboard div {
+    padding: 1rem;
+    border: 5px solid #333;
+    font-size: 1.4rem;
+    font-weight: bold;
+    border-radius: .3em;
+    display: flex;
+    align-items: center;
+}
+
+#p1-score,
+#p2-score {
+    color: #fa4;
+    font-size: 2rem;
+    margin-left: .7rem;
+}
+
+.click-disabled {
+    pointer-events: none;
+    background: #eee;
+}
+
+.btn-reset {
+    padding: 1rem 1.5rem;
+    background: #fa4;
+    color: #333;
+    border: 3px solid #333;
+    border-radius: .3em;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.btn-reset:hover {
+    cursor: pointer;
+    background: #f90;
 }

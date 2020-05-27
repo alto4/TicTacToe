@@ -1,5 +1,3 @@
-let movesMade = 0;
-
 // Game Board as an array - module
 const Gameboard = (() => {
   let squares = [
@@ -10,11 +8,13 @@ const Gameboard = (() => {
 
   let player1Score = 0;
   let player2Score = 0;
+  let movesMade = 0;
 
   return {
     squares,
     player1Score,
     player2Score,
+    movesMade,
   };
 })();
 
@@ -25,6 +25,7 @@ const Player = (name, mark) => {
   let score = 0;
 
   return {
+    name,
     mark,
     score,
   };
@@ -68,56 +69,47 @@ const RenderGame = (() => {
 // Game Object - module
 const PlayGame = (() => {
   let winnerDeclared = false;
-  const winningCombos = [
-    [0, 1, 2],
-    [3, 4, 5],
-    [6, 7, 8],
-    [0, 3, 6],
-    [1, 4, 7],
-    [2, 5, 8],
-    [0, 4, 8],
-    [2, 4, 6],
-  ];
   let mark = player1.mark;
 
   let squares = Array.from(RenderGame.board.children);
   squares.forEach((square) => {
-    square.addEventListener("mouseup", changeStatus);
+    square.addEventListener("click", changeStatus);
 
     function changeStatus(e) {
-      const turnPrompt = document.querySelector(".turn");
+      const turnDiv = document.querySelector(".turn");
 
       let indexX = e.target.getAttribute("data-index-x");
       let indexY = e.target.getAttribute("data-index-y");
 
-      if (movesMade % 2 === 0) {
+      if (Gameboard.movesMade % 2 === 0 || Gameboard.movesMade === 0) {
         mark = player1.mark;
-        turnPrompt.textContent = "Player 1's turn";
-        movesMade++;
+        turnDiv.textContent = "Player 2's turn";
+        Gameboard.movesMade++;
       } else {
         mark = player2.mark;
-        turnPrompt.textContent = "Player 2's turn";
-        movesMade++;
+        turnDiv.textContent = "Player 1's turn";
+        Gameboard.movesMade++;
       }
       e.target.textContent = mark;
+      console.log(e.target);
+      e.target.classList.add("click-disabled");
       Gameboard.squares[indexY][indexX] = mark;
-      console.log(movesMade);
+
       // Check here for a win or a draw
-      if (movesMade === 9) {
-        alert("It's a draw");
+      if (Gameboard.movesMade === 9) {
+        turnDiv.textContent = "It's a draw!";
+        reset();
+        Gameboard.movesMade = 0;
+      } else {
+        checkForWinningCombo(Gameboard);
       }
     }
   });
-
-  return {
-    winningCombos,
-  };
 })();
 
 // Logic to Check if a winner pattern has been created with matching marks, or if the game is a tie/stale-mate
-function checkForWinningCombo(board, x, y) {
+function checkForWinningCombo(board) {
   const squares = Gameboard.squares;
-  const winningCombos = PlayGame.winningCombos;
 
   // Loop through columns to see if winning pattern exists
   for (let y = 0; y < Gameboard.squares.length; y++) {
@@ -126,7 +118,7 @@ function checkForWinningCombo(board, x, y) {
       squares[y][0] === squares[y][2] &&
       squares[y][0] !== ""
     ) {
-      return "Winner! CHICKEN DINNER!";
+      return determineWinner(squares[y][0]);
     }
   }
 
@@ -137,7 +129,7 @@ function checkForWinningCombo(board, x, y) {
       squares[0][x] === squares[2][x] &&
       squares[0][x] !== ""
     ) {
-      return "Winner! CHICKEN DINNER!";
+      return determineWinner(squares[0][x]);
     }
   }
 
@@ -145,13 +137,64 @@ function checkForWinningCombo(board, x, y) {
   if (
     (squares[0][0] === squares[1][1] &&
       squares[0][0] === squares[2][2] &&
-      squares[0][0] !== "") ||
+      squares[1][1] !== "") ||
     (squares[0][2] === squares[1][1] &&
       squares[0][2] === squares[2][0] &&
-      squares[0][0] !== "")
+      squares[1][1] !== "")
   ) {
-    return "Winner! CHICKEN DINNER!";
+    return determineWinner(squares[1][1]);
   }
   console.log(squares);
-  console.log(winningCombos);
 }
+
+function determineWinner(square) {
+  const turnDiv = document.querySelector(".turn");
+
+  if (square === player1.mark) {
+    turnDiv.textContent = `${player1.name} wins!!!`;
+
+    setTimeout(function () {
+      reset();
+      turnDiv.textContent = "Player 1's Turn";
+    }, 1500);
+    return Gameboard.player1Score++;
+  }
+
+  if (square === player2.mark) {
+    turnDiv.textContent = `${player2.name} wins!!!`;
+
+    setTimeout(function () {
+      reset();
+      turnDiv.textContent = "Player 1's Turn";
+    }, 1000);
+    return Gameboard.player2Score++;
+  }
+}
+
+function reset() {
+  let squares = document.querySelectorAll(".square");
+  squares.forEach((square) => {
+    square.textContent = "";
+    square.classList.remove("click-disabled");
+    document.querySelector("#p1-score").textContent = Gameboard.player1Score;
+    document.querySelector("#p2-score").textContent = Gameboard.player2Score;
+
+    Gameboard.movesMade = 0;
+    Gameboard.squares = [
+      ["", "", ""],
+      ["", "", ""],
+      ["", "", ""],
+    ];
+  });
+}
+
+// Reset Button
+const resetButton = document.querySelector(".btn-reset");
+
+resetButton.addEventListener("click", () => {
+  Gameboard.player1Score = 0;
+  Gameboard.player2Score = 0;
+  document.querySelector("#p1-score").textContent = Gameboard.player1Score;
+  document.querySelector("#p2-score").textContent = Gameboard.player2Score;
+  reset();
+});
